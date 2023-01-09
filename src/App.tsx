@@ -58,21 +58,24 @@ function App() {
     const response = await postSubmission(body);
     let decodedBase64;
     if (response.compile_output !== null) {
+      //decode compiled O/P from base64
       decodedBase64 = base64_decode(response.compile_output);
       setCompilationError(true);
       setCompiledOutput(decodedBase64);
     } else if (response.stderr !== null) {
+      //decode compiled O/P from base64
       decodedBase64 = base64_decode(response.stderr);
       setCompilationError(true);
       setCompiledOutput(decodedBase64);
     } else {
+      //decode compiled O/P from base64
       decodedBase64 = base64_decode(response.stdout);
       setCompilationError(false);
       setCompiledOutput(decodedBase64);
     }
   };
 
-  console.log(`selectedLanguage ====> ${srcCode}`);
+  // console.log(`selectedLanguage ====> ${srcCode}`);
 
   return (
     <div className="App">
