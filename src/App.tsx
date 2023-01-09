@@ -2,6 +2,7 @@ import "./App.css";
 import Editor from "@monaco-editor/react";
 import { useCallback, useEffect, useState } from "react";
 import {
+  getBoilerPlateCode,
   getLanguages,
   getSingleLanguage,
   postSubmission,
@@ -28,8 +29,16 @@ function App() {
   const fetchSingleLanguage = useCallback(async () => {
     const response = await getSingleLanguage(selectedLanguageId);
     // console.log(response);
-    setSelectedLanguage(response?.name?.split("(")[0].toLocaleLowerCase());
-    console.log(response?.name?.split("(")[0].toLocaleLowerCase());
+    let refactoredLanguageName = response?.name
+      ?.split("(")[0]
+      .toLocaleLowerCase()
+      ?.split(" ")[0];
+    setSelectedLanguage(refactoredLanguageName);
+    console.log(refactoredLanguageName);
+
+    const res = await getBoilerPlateCode(refactoredLanguageName);
+    console.log(res);
+    setSrcCode(res);
   }, [selectedLanguageId]);
 
   useEffect(() => {
@@ -52,6 +61,10 @@ function App() {
       decodedBase64 = base64_decode(response.compile_output);
       setCompilationError(true);
       setCompiledOutput(decodedBase64);
+    } else if (response.stderr !== null) {
+      decodedBase64 = base64_decode(response.stderr);
+      setCompilationError(true);
+      setCompiledOutput(decodedBase64);
     } else {
       decodedBase64 = base64_decode(response.stdout);
       setCompilationError(false);
@@ -59,7 +72,7 @@ function App() {
     }
   };
 
-  console.log(`selectedLanguage ====> ${selectedLanguage}`);
+  console.log(`selectedLanguage ====> ${srcCode}`);
 
   return (
     <div className="App">
@@ -94,6 +107,7 @@ function App() {
                     onChange={(value: any) => setSrcCode(value)}
                     defaultLanguage={selectedLanguage}
                     defaultValue={""}
+                    value={srcCode}
                     theme="vs-dark"
                     options={{
                       quickSuggestions: {
@@ -113,8 +127,8 @@ function App() {
                 </div>
                 <div className="col-5 p-0">
                   <p className="mb-0 ps-2 text-start">Compiler</p>
-                  <input
-                    type={"text"}
+                  <textarea
+                    // type={"text"}
                     value={compiledOutput}
                     style={{
                       height: "50%",

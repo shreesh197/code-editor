@@ -26,3 +26,11 @@ export const postSubmission = (data: any) => {
       return result.data;
     });
 };
+
+export const getBoilerPlateCode = (language: string) => {
+  return Api()
+    .get(`/monaco-editor/index/samples/sample.${language}.txt`)
+    .then((result: any) => {
+      return result.data;
+    });
+};
